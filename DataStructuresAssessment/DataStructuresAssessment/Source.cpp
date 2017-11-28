@@ -64,7 +64,6 @@ int main() {
 			
 			al_flip_display();
 		}
-
 	}
 
 	al_destroy_display(display);

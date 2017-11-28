@@ -105,7 +105,7 @@ NodeSearchResult BreadthFirstSearch::search(Nodemap & nodemap, Node * start, Nod
 			Node* neighbour = front->neighbours[i];
 
 			// if neighbour doesn't exist, or has been visited already..
-			if (neighbour == nullptr || visited[neighbour]) continue;
+			if (neighbour == nullptr || visited[neighbour] || !neighbour->traversable) continue;
 
 			// mark visited
 			visited[neighbour] = true;
