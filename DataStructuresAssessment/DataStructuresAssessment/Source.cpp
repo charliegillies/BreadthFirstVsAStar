@@ -10,6 +10,7 @@
 #include <allegro5\allegro_ttf.h>
 #include <allegro5\allegro_font.h>
 #include <allegro5\allegro_image.h>
+#include <allegro5\allegro_primitives.h>
 
 int main() {
 
@@ -17,6 +18,7 @@ int main() {
 	assert(al_init_font_addon());
 	assert(al_init_ttf_addon());
 	assert(al_init_image_addon());
+	assert(al_init_primitives_addon());
 
 	// application
 	App app;
@@ -32,7 +34,8 @@ int main() {
 	al_register_event_source(evQueue, al_get_timer_event_source(timer));
 	al_start_timer(timer);
 
-	al_clear_to_color(al_map_rgb(0, 0, 0));
+	ALLEGRO_COLOR clearColor = al_map_rgb(0, 0, 0);
+	al_clear_to_color(clearColor);
 
 	bool tick = false;
 
@@ -53,7 +56,7 @@ int main() {
 			tick = false;
 
 			// clear to color
-			al_clear_to_color(al_map_rgb(255, 255, 255));
+			al_clear_to_color(clearColor);
 			
 			// tick
 			app.update(1.0 / 60);

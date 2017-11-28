@@ -47,6 +47,11 @@ public:
 	std::vector<Node*> path;
 
 	/*
+	 * All nodes that were traversed in the search.
+	 */
+	std::vector<Node*> traversed;
+
+	/*
 	 * If the search was successful or not.
 	 */
 	bool success; 

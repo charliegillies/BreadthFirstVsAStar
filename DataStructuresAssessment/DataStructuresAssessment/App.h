@@ -8,6 +8,9 @@
 class App {
 private:
 	Nodemap* _nodeMap;
+	Node* _start;
+	Node* _end;
+	NodeSearchResult _searchResult;
 
 public:
 	App();

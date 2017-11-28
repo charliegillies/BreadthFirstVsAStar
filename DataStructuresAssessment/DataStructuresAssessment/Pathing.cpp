@@ -3,9 +3,9 @@
 #include <queue>
 #include <map>
 
-Node::Node(int x, int y) : traversable(false), x(x), y(y) { }
+Node::Node(int x, int y) : traversable(true), x(x), y(y) { }
 
-Nodemap::Nodemap(int width, int height)
+Nodemap::Nodemap(int width, int height) : _width(width), _height(height)
 {
 	// setup & populate the 2d array
 	for (int i = 0; i < height; i++) {
@@ -52,6 +52,15 @@ NodeSearchResult pathfind(NodeSearch & search, Nodemap & map, Node * start, Node
 
 NodeSearchResult BreadthFirstSearch::search(Nodemap & nodemap, Node * start, Node * end)
 {
+	NodeSearchResult result;
+
+	// early exit if start or end cannot be traversed
+	if (!start->traversable || !end->traversable) {
+		result.success = false;
+		return result;
+	}
+
+
 	// the expanding ring, starts at start
 	std::queue<Node*> frontier;
 	frontier.push(start);
@@ -70,7 +79,6 @@ NodeSearchResult BreadthFirstSearch::search(Nodemap & nodemap, Node * start, Nod
 
 		// we've reached the point we want to be at..
 		if (front == end) {
-			NodeSearchResult result;
 			result.success = true;
 
 			// build path..
@@ -79,6 +87,10 @@ NodeSearchResult BreadthFirstSearch::search(Nodemap & nodemap, Node * start, Nod
 				result.path.push_back(pnode);
 				pnode = cameFrom[pnode];
 			}
+
+			for (auto visited_pair : visited)
+				if (visited_pair.second)
+					result.traversed.push_back(visited_pair.first);
 
 			std::reverse(result.path.begin(), result.path.end());
 			return result;
@@ -108,7 +120,6 @@ NodeSearchResult BreadthFirstSearch::search(Nodemap & nodemap, Node * start, Nod
 	}
 
 	// if we've reached here, we failed.
-	NodeSearchResult result;
 	result.success = false;
 	return result;
 }
