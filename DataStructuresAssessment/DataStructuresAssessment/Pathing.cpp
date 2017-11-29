@@ -190,14 +190,14 @@ NodeSearchResult AStarSearch::search(Nodemap & nodemap, Node * start, Node * end
 			// or.. the new cost is better than our current cost
 			if (costSoFar.find(next) == costSoFar.end() || newcost < currentCost) {
 				// set the cost so far
-				costSoFar[next] = currentCost;
+				costSoFar[next] = newcost;
 
 				// we came from the current top
 				cameFrom[next] = front;
 
 				// calculate priority & put it into the frontier
 				int priority = newcost + heuristic(end, next);
-				frontier.put(next, newcost);
+				frontier.put(next, priority);
 			}
 		}
 	}

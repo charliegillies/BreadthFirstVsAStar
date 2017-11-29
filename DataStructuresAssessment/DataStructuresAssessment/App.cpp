@@ -13,12 +13,15 @@ void App::initialize()
 	// build a nodemap
 	_nodeMap = new Nodemap(30, 18);
 
-	_nodeMap->getNode(8, 8)->traversable = false;
-	_nodeMap->getNode(0, 2)->traversable = false;
-
 	_startNode = _nodeMap->getNode(0, 0);
 	_endNode = _nodeMap->getNode(3, 3);
-	
+
+	_nodeMap->getNode(3, 2)->traversable = false;
+	_nodeMap->getNode(2, 3)->traversable = false;
+	_nodeMap->getNode(4, 3)->traversable = false;
+
+	randomize_map();
+
 	_searchResult = pathfind(AStarSearch(), *_nodeMap, _startNode, _endNode);
 }
 
@@ -82,13 +85,53 @@ void App::render()
 			// draw a rectangle in this node position
 			al_draw_filled_rectangle(xp, yp, xp + size, yp + size, color);
 
-			// draw the weight of the node 
-			std::string nodeweight = std::to_string(_nodeMap->getNode(x, y)->weight);
-			al_draw_text(smallArial, al_map_rgb(255, 255, 255), xp + 10, yp + 6, 0, nodeweight.data());
+			if (node->traversable) {
+				// draw the weight of the node 
+				std::string nodeweight = std::to_string(_nodeMap->getNode(x, y)->weight);
+				al_draw_text(smallArial, al_map_rgb(255, 255, 255), xp + 10, yp + 6, 0, nodeweight.data());
+			}
 		}
 	}
 
 	// draw search time on screen
 	std::string searchtime = std::to_string(_searchResult.time) + "s";
 	al_draw_text(largeArial, al_map_rgb(255, 255, 255), 90, 650, ALLEGRO_ALIGN_CENTER, searchtime.data());
+}
+
+void App::randomize_map()
+{
+	int w = _nodeMap->getWidth();
+	int h = _nodeMap->getHeight();
+	int r = (w * h) / 8;
+
+	// set a set of random nodes to be untraversable..
+	for (int i = 0; i < r; i++) {
+		// random x & y coords
+		int ix = rand() % w;
+		int iy = rand() % h;
+
+		// skip if start or end node
+		if (ix == _startNode->x && iy == _startNode->y)
+			continue;
+		if (ix == _endNode->x && iy == _endNode->y)
+			continue;
+
+		_nodeMap->getNode(ix, iy)->traversable = false;
+	}
+
+	// change the weights of some random nodes..
+	for (int i = 0; i < r; i++) {
+		// random x & y coords
+		int ix = rand() % w;
+		int iy = rand() % h;
+
+		// skip if start or end node
+		if (ix == _startNode->x && iy == _startNode->y)
+			continue;
+		if (ix == _endNode->x && iy == _endNode->y)
+			continue;
+
+		// set a random weight between 1 and 9
+		_nodeMap->getNode(ix, iy)->weight = rand() % 9 + 1;
+	}
 }

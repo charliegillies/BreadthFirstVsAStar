@@ -23,4 +23,7 @@ public:
 
 	/** Frame rendering. */
 	void render();
+
+	/** Randomize map data. */
+	void randomize_map();
 };
