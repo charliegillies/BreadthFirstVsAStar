@@ -1,6 +1,9 @@
 #pragma once
 
 #include <vector>
+#include <map>
+#include <functional>
+#include <queue>
 
 struct Node {
 public:
@@ -11,8 +14,13 @@ public:
 
 	// if node can be traversed or not
 	bool traversable;
+
 	// position of the node on the graph
 	int x, y;
+
+	// weight of the node, used for weighted searches like A*
+	// default weight value is 1
+	int weight;
 };
 
 class Nodemap {
@@ -55,6 +63,56 @@ public:
 	 * If the search was successful or not.
 	 */
 	bool success; 
+
+	/*
+	 * The time that it took to perform the search. 
+	 */
+	double time;
+};
+
+/*
+ * Heuristic calculation between A and B.
+ */
+int heuristic(Node* a, Node* b);
+
+/*
+ * Wrapper around std::priority_queue that allows 
+ * prioritization of elements through a given value
+ * rather than a comparator between elements.
+ */
+template<typename Value, typename PriorityValue = int>
+class PriorityQueue {
+private:
+	// pair where integer represents the priority
+	// and the T value represents our queue type
+	typedef std::pair<PriorityValue, Value> qPair;
+
+	// the standard lib priority queue that we're operating on 
+	std::priority_queue<qPair, std::vector<qPair>, std::greater<qPair>> _pQueue;
+
+public:
+	/*
+	 * If our queue is empty or not.
+	 */
+	inline bool empty() {
+		return _pQueue.empty();
+	}
+
+	/* 
+	 * Put an item into the queue with a given priority.
+	 */
+	inline void put(Value item, PriorityValue priority) {
+		_pQueue.emplace(priority, item);
+	}
+
+	/*
+	 * Gets the top value of the priority queue - and also pops it.
+	 */
+	inline Value get() {
+		Value top = _pQueue.top().second;
+		_pQueue.pop();
+		return top;
+	}
 };
 
 /*
@@ -66,6 +124,11 @@ public:
 };
 
 class BreadthFirstSearch : public NodeSearch {
+public:
+	NodeSearchResult search(Nodemap& nodemap, Node* start, Node* end) override;
+};
+
+class AStarSearch : public NodeSearch {
 public:
 	NodeSearchResult search(Nodemap& nodemap, Node* start, Node* end) override;
 };

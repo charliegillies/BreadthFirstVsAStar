@@ -14,6 +14,8 @@
 
 int main() {
 
+	// attempt to initialize all of our addons
+	// use assert to make sure that they have initialized
 	assert(al_init());
 	assert(al_init_font_addon());
 	assert(al_init_ttf_addon());

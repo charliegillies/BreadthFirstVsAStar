@@ -8,8 +8,8 @@
 class App {
 private:
 	Nodemap* _nodeMap;
-	Node* _start;
-	Node* _end;
+	Node* _startNode;
+	Node* _endNode;
 	NodeSearchResult _searchResult;
 
 public:

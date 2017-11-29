@@ -1,9 +1,11 @@
 #include "Pathing.h"
 
-#include <queue>
-#include <map>
+#include <math.h>
+#include <chrono>
+using namespace std::chrono;
 
-Node::Node(int x, int y) : traversable(true), x(x), y(y) { }
+
+Node::Node(int x, int y) : traversable(true), x(x), y(y), weight(1) { }
 
 Nodemap::Nodemap(int width, int height) : _width(width), _height(height)
 {
@@ -44,9 +46,26 @@ int Nodemap::getHeight()
 	return _height;
 }
 
+int heuristic(Node * a, Node * b)
+{
+	return abs(a->x - b->x) + abs(a->y + b->y);
+}
+
 NodeSearchResult pathfind(NodeSearch & search, Nodemap & map, Node * start, Node * end)
 {
+	// begin timer...
+	auto start_clock = high_resolution_clock::now();
+
+	// begin the search
 	NodeSearchResult result = search.search(map, start, end);
+	
+	// end timer..
+	auto end_clock = high_resolution_clock::now();
+
+	// set time
+	duration<double> timespan = duration_cast<duration<double>>(end_clock - start_clock);
+	result.time = timespan.count();
+
 	return result;
 }
 
@@ -60,15 +79,14 @@ NodeSearchResult BreadthFirstSearch::search(Nodemap & nodemap, Node * start, Nod
 		return result;
 	}
 
-
-	// the expanding ring, starts at start
+	// the expanding ring, starts at the start node
 	std::queue<Node*> frontier;
 	frontier.push(start);
 
 	// map indicating what nodes have been visited
 	std::map<Node*, bool> visited;
 
-	// map indicating how the traveral happened
+	// map indicating how the traversal happened
 	std::map<Node*, Node*> cameFrom;
 	cameFrom[start] = nullptr;
  
@@ -120,6 +138,84 @@ NodeSearchResult BreadthFirstSearch::search(Nodemap & nodemap, Node * start, Nod
 	}
 
 	// if we've reached here, we failed.
+	result.success = false;
+	return result;
+}
+
+NodeSearchResult AStarSearch::search(Nodemap & nodemap, Node * start, Node * end)
+{
+	// A* Search..
+	NodeSearchResult result;
+
+	// early exit if start or end cannot be traversed
+	if (!start->traversable || !end->traversable) {
+		result.success = false;
+		return result;
+	}
+
+	// the expanding ring, starts at the start node
+	PriorityQueue<Node*> frontier;
+	frontier.put(start, 0);
+
+	// map indicating how the traversal happened
+	std::map<Node*, Node*> cameFrom;
+	cameFrom[start] = nullptr;
+
+	// the calculated heuristics
+	std::map<Node*, int> costSoFar;
+	costSoFar[start] = 0;
+
+	while (!frontier.empty()) {
+		Node* front = frontier.get();
+
+		// early exit..
+		if (front == end) {
+			result.success = true;
+
+			// build path..
+			Node* pnode = front;
+			while (pnode != nullptr) {
+				result.path.push_back(pnode);
+				pnode = cameFrom[pnode];
+			}
+
+			for (auto visited_pair : costSoFar)
+				result.traversed.push_back(visited_pair.first);
+
+			std::reverse(result.path.begin(), result.path.end());
+			return result;
+		}
+
+		// check neighbours for frontier eligibility
+		for (Node* next : front->neighbours) {
+
+			// if neighbour doesn't exist, or is not traversable.. go to next
+			if (next == nullptr || !next->traversable) continue;
+
+			// current cost of our traversal
+			int currentCost = costSoFar[front];
+
+			// the potential new cost of the movement
+			int newcost = currentCost + next->weight;
+
+			// if the cost so far doesn't have our neighbour
+			// or.. the new cost is better than our current cost
+			if (costSoFar.find(next) == costSoFar.end() || newcost < currentCost) {
+				// set the cost so far
+				costSoFar[next] = currentCost;
+
+				// we came from the current top
+				cameFrom[next] = front;
+
+				// calculate priority & put it into the frontier
+				int priority = newcost + heuristic(end, next);
+				frontier.put(next, newcost);
+			}
+		}
+	}
+
+
+	// Default return case
 	result.success = false;
 	return result;
 }
