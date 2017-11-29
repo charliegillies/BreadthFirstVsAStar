@@ -6,18 +6,24 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
 
-App::App() { }
+App::App() { 
+	_search = Search::AStar;
+	srand((unsigned)time(NULL));
+}
+
+const int WIDTH = 30;
+const int HEIGHT = 18;
 
 void App::initialize()
 {
 	// build a nodemap
-	_nodeMap = new Nodemap(30, 18);
+	_nodeMap = new Nodemap(WIDTH, HEIGHT);
 
-	srand((unsigned)time(NULL));
 	randomize_start_end();
 	randomize_map();
 
-	_searchResult = pathfind(AStarSearch(), *_nodeMap, _startNode, _endNode);
+	_aStarSearchResult = pathfind(AStarSearch(), *_nodeMap, _startNode, _endNode);
+	_breadthSearchResult = pathfind(BreadthFirstSearch(), *_nodeMap, _startNode, _endNode);
 }
 
 void App::update(float dt) { }
@@ -49,6 +55,9 @@ void App::render()
 	static ALLEGRO_FONT* largeArial	= al_load_ttf_font("arial.ttf", 36, 0);
 	static ALLEGRO_FONT* smallArial = al_load_ttf_font("arial.ttf", 18, 0);
 
+	// current result target
+	NodeSearchResult result = (_search == AStar) ? _aStarSearchResult : _breadthSearchResult;
+
 	// visualise nodemap
 	for (int x = 0; x < _nodeMap->getWidth(); x++) {
 		for (int y = 0; y < _nodeMap->getHeight(); y++) {
@@ -66,10 +75,10 @@ void App::render()
 			else if (!node->traversable) {
 				color = darkg;
 			} // else, if it's a path node (in path sequence)
-			else if (node_position_in_list(x, y, _searchResult.path)) {
+			else if (node_position_in_list(x, y, result.path)) {
 				color = blue;
 			} // otherwise, if node was considered
-			else if (node_position_in_list(x, y, _searchResult.traversed)) {
+			else if (node_position_in_list(x, y, result.traversed)) {
 				color = purple;
 			}
 
@@ -89,8 +98,28 @@ void App::render()
 	}
 
 	// draw search time on screen
-	std::string searchtime = std::to_string(_searchResult.time) + "s";
-	al_draw_text(largeArial, al_map_rgb(255, 255, 255), 90, 650, ALLEGRO_ALIGN_CENTER, searchtime.data());
+	std::string searchtime = std::to_string(_aStarSearchResult.time) + "s";
+	searchtime += (_search == AStar) ? " (A*)" : " (BF)";
+
+	al_draw_text(largeArial, al_map_rgb(255, 255, 255), 120, 650, ALLEGRO_ALIGN_CENTER, searchtime.data());
+}
+
+void App::on_key_up(int key)
+{
+	if (key == ALLEGRO_KEY_SPACE) {
+		// switch from A* to BFS
+		_search = (_search == AStar) ? Breadth : AStar;
+	}
+	else if (key == ALLEGRO_KEY_R) {
+		// Refresh the searches
+		_aStarSearchResult = pathfind(AStarSearch(), *_nodeMap, _startNode, _endNode);
+		_breadthSearchResult = pathfind(BreadthFirstSearch(), *_nodeMap, _startNode, _endNode);
+	}
+	else if (key == ALLEGRO_KEY_F) {
+		// build a nodemap
+		delete _nodeMap;
+		initialize();
+	}
 }
 
 void App::randomize_start_end()

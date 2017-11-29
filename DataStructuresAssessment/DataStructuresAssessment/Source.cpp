@@ -21,6 +21,7 @@ int main() {
 	assert(al_init_ttf_addon());
 	assert(al_init_image_addon());
 	assert(al_init_primitives_addon());
+	assert(al_install_keyboard());
 
 	// application
 	App app;
@@ -34,6 +35,7 @@ int main() {
 	// register events
 	al_register_event_source(evQueue, al_get_display_event_source(display));
 	al_register_event_source(evQueue, al_get_timer_event_source(timer));
+	al_register_event_source(evQueue, al_get_keyboard_event_source());
 	al_start_timer(timer);
 
 	ALLEGRO_COLOR clearColor = al_map_rgb(0, 0, 0);
@@ -47,6 +49,9 @@ int main() {
 
 		if (ev.type == ALLEGRO_EVENT_TIMER) {
 			tick = true;
+		}
+		else if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
+			app.on_key_up(ev.keyboard.keycode);
 		}
 		else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
 			// exit the while loop

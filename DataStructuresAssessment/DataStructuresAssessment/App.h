@@ -10,7 +10,21 @@ private:
 	Nodemap* _nodeMap;
 	Node* _startNode;
 	Node* _endNode;
-	NodeSearchResult _searchResult;
+
+	NodeSearchResult _aStarSearchResult;
+	NodeSearchResult _breadthSearchResult;
+
+	enum Search {
+		AStar, Breadth
+	};
+
+	Search _search;
+
+	/** Randomize map weights and traversal states. */
+	void randomize_map();
+
+	/** Randomize the start and end position of the search. */
+	void randomize_start_end();
 
 public:
 	App();
@@ -24,9 +38,7 @@ public:
 	/** Frame rendering. */
 	void render();
 
-	/** Randomize map weights and traversal states. */
-	void randomize_map();
+	/** On key up. */
+	void on_key_up(int key);
 
-	/** Randomize the start and end position of the search. */
-	void randomize_start_end();
 };
