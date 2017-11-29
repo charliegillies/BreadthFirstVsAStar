@@ -7,7 +7,7 @@
 #include <allegro5/allegro_ttf.h>
 
 App::App() { 
-	_search = Search::AStar;
+	_search = Search::Breadth;
 	srand((unsigned)time(NULL));
 }
 
@@ -19,7 +19,8 @@ void App::initialize()
 	// build a nodemap
 	_nodeMap = new Nodemap(WIDTH, HEIGHT);
 
-	randomize_start_end();
+	test_start_end();
+	//randomize_start_end();
 	randomize_map();
 
 	_aStarSearchResult = pathfind(AStarSearch(), *_nodeMap, _startNode, _endNode);
@@ -90,7 +91,8 @@ void App::render()
 			// draw a rectangle in this node position
 			al_draw_filled_rectangle(xp, yp, xp + size, yp + size, color);
 
-			if (node->traversable) {
+			// only draw the heuristic if we're using A*
+			if (_search == AStar && node->traversable) {
 				// draw the weight of the node 
 				std::string nodeweight = std::to_string(_nodeMap->getNode(x, y)->weight);
 				al_draw_text(smallArial, white, xp + 10, yp + 6, 0, nodeweight.data());
@@ -147,6 +149,16 @@ void App::randomize_start_end()
 	// set the start & end nodes
 	_startNode = _nodeMap->getNode(sx, sy);
 	_endNode = _nodeMap->getNode(ex, ey);
+}
+
+void App::test_start_end()
+{
+	// w & h
+	int w = _nodeMap->getWidth();
+	int h = _nodeMap->getHeight();
+
+	_startNode	= _nodeMap->getNode(0, 0);
+	_endNode	= _nodeMap->getNode(w - 1, h - 1);
 }
 
 void App::randomize_map()

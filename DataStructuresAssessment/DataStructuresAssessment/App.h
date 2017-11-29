@@ -26,6 +26,9 @@ private:
 	/** Randomize the start and end position of the search. */
 	void randomize_start_end();
 
+	/** Assigns start as (0,0) and end as (w-1,h-1). */
+	void test_start_end();
+
 public:
 	App();
 
