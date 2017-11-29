@@ -50,6 +50,7 @@ void App::render()
 	static ALLEGRO_COLOR red	= al_map_rgb(178, 26, 25);
 	static ALLEGRO_COLOR blue	= al_map_rgb(25, 165, 255);
 	static ALLEGRO_COLOR darkg	= al_map_rgb(32, 32, 32);
+	static ALLEGRO_COLOR white	= al_map_rgb(255, 255, 255);
 
 	// default font
 	static ALLEGRO_FONT* largeArial	= al_load_ttf_font("arial.ttf", 36, 0);
@@ -92,16 +93,17 @@ void App::render()
 			if (node->traversable) {
 				// draw the weight of the node 
 				std::string nodeweight = std::to_string(_nodeMap->getNode(x, y)->weight);
-				al_draw_text(smallArial, al_map_rgb(255, 255, 255), xp + 10, yp + 6, 0, nodeweight.data());
+				al_draw_text(smallArial, white, xp + 10, yp + 6, 0, nodeweight.data());
 			}
 		}
 	}
 
 	// draw search time on screen
 	std::string searchtime = std::to_string(_aStarSearchResult.time) + "s";
+	// indicate if search is A* or BFS
 	searchtime += (_search == AStar) ? " (A*)" : " (BF)";
-
-	al_draw_text(largeArial, al_map_rgb(255, 255, 255), 120, 650, ALLEGRO_ALIGN_CENTER, searchtime.data());
+	// draw the search time 
+	al_draw_text(largeArial, white, 120, 650, ALLEGRO_ALIGN_CENTER, searchtime.data());
 }
 
 void App::on_key_up(int key)
@@ -116,7 +118,7 @@ void App::on_key_up(int key)
 		_breadthSearchResult = pathfind(BreadthFirstSearch(), *_nodeMap, _startNode, _endNode);
 	}
 	else if (key == ALLEGRO_KEY_F) {
-		// build a nodemap
+		// delete old map, build a new nodemap
 		delete _nodeMap;
 		initialize();
 	}
