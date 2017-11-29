@@ -96,6 +96,8 @@ void App::render()
 
 void App::randomize_map()
 {
+	srand((unsigned)time(NULL));
+
 	int w = _nodeMap->getWidth();
 	int h = _nodeMap->getHeight();
 	int r = (w * h) / 8;
