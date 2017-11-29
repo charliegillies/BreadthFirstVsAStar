@@ -13,9 +13,8 @@ void App::initialize()
 	// build a nodemap
 	_nodeMap = new Nodemap(30, 18);
 
-	_startNode = _nodeMap->getNode(0, 0);
-	_endNode = _nodeMap->getNode(3, 3);
-
+	srand((unsigned)time(NULL));
+	randomize_start_end();
 	randomize_map();
 
 	_searchResult = pathfind(AStarSearch(), *_nodeMap, _startNode, _endNode);
@@ -94,10 +93,33 @@ void App::render()
 	al_draw_text(largeArial, al_map_rgb(255, 255, 255), 90, 650, ALLEGRO_ALIGN_CENTER, searchtime.data());
 }
 
+void App::randomize_start_end()
+{
+	// w & h
+	int w = _nodeMap->getWidth();
+	int h = _nodeMap->getHeight();
+
+	// random start x & y position
+	int sx = rand() % w;
+	int sy = rand() % h;
+
+	// random end x & y position
+	int ex = rand() % w;
+	int ey = rand() % h;
+
+	// ensure that start and end aren't the same
+	while (sx == ex)
+		ex = rand() % w;
+	while (sy == ey)
+		ey = rand() % h;
+
+	// set the start & end nodes
+	_startNode = _nodeMap->getNode(sx, sy);
+	_endNode = _nodeMap->getNode(ex, ey);
+}
+
 void App::randomize_map()
 {
-	srand((unsigned)time(NULL));
-
 	int w = _nodeMap->getWidth();
 	int h = _nodeMap->getHeight();
 	int r = (w * h) / 8;

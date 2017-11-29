@@ -24,6 +24,9 @@ public:
 	/** Frame rendering. */
 	void render();
 
-	/** Randomize map data. */
+	/** Randomize map weights and traversal states. */
 	void randomize_map();
+
+	/** Randomize the start and end position of the search. */
+	void randomize_start_end();
 };
