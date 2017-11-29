@@ -99,7 +99,7 @@ void App::render()
 	}
 
 	// draw search time on screen
-	std::string searchtime = std::to_string(_aStarSearchResult.time) + "s";
+	std::string searchtime = std::to_string(result.time) + "s";
 	// indicate if search is A* or BFS
 	searchtime += (_search == AStar) ? " (A*)" : " (BF)";
 	// draw the search time 

@@ -25,7 +25,6 @@ int main() {
 
 	// application
 	App app;
-	app.initialize();
 
 	// initialize allegro
 	ALLEGRO_DISPLAY* display = al_create_display(1280, 720);
@@ -42,6 +41,8 @@ int main() {
 	al_clear_to_color(clearColor);
 
 	bool tick = false;
+
+	app.initialize();
 
 	while (true) {
 		ALLEGRO_EVENT ev;
