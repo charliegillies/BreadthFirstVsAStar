@@ -48,12 +48,15 @@ void App::render()
 	static ALLEGRO_COLOR darkg	= al_map_rgb(32, 32, 32);
 
 	// default font
-	static ALLEGRO_FONT* font	= al_load_ttf_font("arial.ttf", 36, 0);
+	static ALLEGRO_FONT* largeArial	= al_load_ttf_font("arial.ttf", 36, 0);
+	static ALLEGRO_FONT* smallArial = al_load_ttf_font("arial.ttf", 18, 0);
 
 	// visualise nodemap
 	for (int x = 0; x < _nodeMap->getWidth(); x++) {
 		for (int y = 0; y < _nodeMap->getHeight(); y++) {
 			ALLEGRO_COLOR color = gray;
+
+			Node* node = _nodeMap->getNode(x, y);
 
 			// if start node..
 			if (_startNode->x == x && _startNode->y == y) {
@@ -62,7 +65,7 @@ void App::render()
 			else if (_endNode->x == x && _endNode->y == y) {
 				color = red;
 			} // else, if the node isn't traversable
-			else if (!_nodeMap->getNode(x, y)->traversable) {
+			else if (!node->traversable) {
 				color = darkg;
 			} // else, if it's a path node (in path sequence)
 			else if (node_position_in_list(x, y, _searchResult.path)) {
@@ -78,10 +81,14 @@ void App::render()
 
 			// draw a rectangle in this node position
 			al_draw_filled_rectangle(xp, yp, xp + size, yp + size, color);
+
+			// draw the weight of the node 
+			std::string nodeweight = std::to_string(_nodeMap->getNode(x, y)->weight);
+			al_draw_text(smallArial, al_map_rgb(255, 255, 255), xp + 10, yp + 6, 0, nodeweight.data());
 		}
 	}
 
 	// draw search time on screen
 	std::string searchtime = std::to_string(_searchResult.time) + "s";
-	al_draw_text(font, al_map_rgb(255, 255, 255), 90, 650, ALLEGRO_ALIGN_CENTER, searchtime.data());
+	al_draw_text(largeArial, al_map_rgb(255, 255, 255), 90, 650, ALLEGRO_ALIGN_CENTER, searchtime.data());
 }
