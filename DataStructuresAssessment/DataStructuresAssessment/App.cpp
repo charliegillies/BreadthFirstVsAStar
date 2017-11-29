@@ -16,10 +16,6 @@ void App::initialize()
 	_startNode = _nodeMap->getNode(0, 0);
 	_endNode = _nodeMap->getNode(3, 3);
 
-	_nodeMap->getNode(3, 2)->traversable = false;
-	_nodeMap->getNode(2, 3)->traversable = false;
-	_nodeMap->getNode(4, 3)->traversable = false;
-
 	randomize_map();
 
 	_searchResult = pathfind(AStarSearch(), *_nodeMap, _startNode, _endNode);
