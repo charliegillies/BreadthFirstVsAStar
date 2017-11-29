@@ -126,11 +126,13 @@ public:
 class BreadthFirstSearch : public NodeSearch {
 public:
 	NodeSearchResult search(Nodemap& nodemap, Node* start, Node* end) override;
+	void buildPath(NodeSearchResult &result, Node * front, std::map<Node *, Node *> &cameFrom, std::map<Node *, bool> &visited);
 };
 
 class AStarSearch : public NodeSearch {
 public:
 	NodeSearchResult search(Nodemap& nodemap, Node* start, Node* end) override;
+	void buildPath(NodeSearchResult &result, Node * front, std::map<Node *, Node *> &cameFrom, std::map<Node *, int> &costSoFar);
 };
 
 /*

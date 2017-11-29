@@ -97,20 +97,7 @@ NodeSearchResult BreadthFirstSearch::search(Nodemap & nodemap, Node * start, Nod
 
 		// we've reached the point we want to be at..
 		if (front == end) {
-			result.success = true;
-
-			// build path..
-			Node* pnode = front;
-			while (pnode != nullptr) {
-				result.path.push_back(pnode);
-				pnode = cameFrom[pnode];
-			}
-
-			for (auto visited_pair : visited)
-				if (visited_pair.second)
-					result.traversed.push_back(visited_pair.first);
-
-			std::reverse(result.path.begin(), result.path.end());
+			buildPath(result, front, cameFrom, visited);
 			return result;
 		}
 
@@ -118,10 +105,7 @@ NodeSearchResult BreadthFirstSearch::search(Nodemap & nodemap, Node * start, Nod
 		visited[front] = true;
 
 		// check neighbours for frontier eligibility
-		for (int i = 0; i < 4; i++) {
-			// neighbour
-			Node* neighbour = front->neighbours[i];
-
+		for (Node* neighbour : front->neighbours) {
 			// if neighbour doesn't exist, or has been visited already..
 			if (neighbour == nullptr || visited[neighbour] || !neighbour->traversable) continue;
 
@@ -134,12 +118,29 @@ NodeSearchResult BreadthFirstSearch::search(Nodemap & nodemap, Node * start, Nod
 			// put into frontier for checking
 			frontier.push(neighbour);
 		}
-
 	}
 
 	// if we've reached here, we failed.
 	result.success = false;
 	return result;
+}
+
+void BreadthFirstSearch::buildPath(NodeSearchResult &result, Node * front, std::map<Node *, Node *> &cameFrom, std::map<Node *, bool> &visited)
+{
+	result.success = true;
+
+	// build path..
+	Node* pnode = front;
+	while (pnode != nullptr) {
+		result.path.push_back(pnode);
+		pnode = cameFrom[pnode];
+	}
+
+	for (auto visited_pair : visited)
+		if (visited_pair.second)
+			result.traversed.push_back(visited_pair.first);
+
+	std::reverse(result.path.begin(), result.path.end());
 }
 
 NodeSearchResult AStarSearch::search(Nodemap & nodemap, Node * start, Node * end)
@@ -168,27 +169,14 @@ NodeSearchResult AStarSearch::search(Nodemap & nodemap, Node * start, Node * end
 	while (!frontier.empty()) {
 		Node* front = frontier.get();
 
-		// early exit..
+		// early exit if we reach our goal
 		if (front == end) {
-			result.success = true;
-
-			// build path..
-			Node* pnode = front;
-			while (pnode != nullptr) {
-				result.path.push_back(pnode);
-				pnode = cameFrom[pnode];
-			}
-
-			for (auto visited_pair : costSoFar)
-				result.traversed.push_back(visited_pair.first);
-
-			std::reverse(result.path.begin(), result.path.end());
+			buildPath(result, front, cameFrom, costSoFar);
 			return result;
 		}
 
 		// check neighbours for frontier eligibility
 		for (Node* next : front->neighbours) {
-
 			// if neighbour doesn't exist, or is not traversable.. go to next
 			if (next == nullptr || !next->traversable) continue;
 
@@ -214,8 +202,24 @@ NodeSearchResult AStarSearch::search(Nodemap & nodemap, Node * start, Node * end
 		}
 	}
 
-
 	// Default return case
 	result.success = false;
 	return result;
+}
+
+void AStarSearch::buildPath(NodeSearchResult &result, Node * front, std::map<Node *, Node *> &cameFrom, std::map<Node *, int> &costSoFar)
+{
+	result.success = true;
+
+	// build path..
+	Node* pnode = front;
+	while (pnode != nullptr) {
+		result.path.push_back(pnode);
+		pnode = cameFrom[pnode];
+	}
+
+	for (auto visited_pair : costSoFar)
+		result.traversed.push_back(visited_pair.first);
+
+	std::reverse(result.path.begin(), result.path.end());
 }
